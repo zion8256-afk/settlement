@@ -110,6 +110,7 @@ input[type=number]{width:70px}
     <button class="btn btn-block" onclick="addDay()">+ 날짜 추가</button>
     <div style="margin-top:10px;display:flex;gap:8px">
       <button class="btn btn-accent" style="flex:1" onclick="saveWeek()">💾 저장</button>
+      <button class="btn" style="flex:1" onclick="newWeek()">🆕 새 주차 시작</button>
     </div>
     <div class="sync-bar" id="save-status" style="margin-top:6px;display:none;justify-content:center">
       <span class="status-dot dot-green"></span><span id="save-status-text"></span>
@@ -622,7 +623,17 @@ function renderOutput() {
   document.getElementById('preview-box').value=lines.join('\n');
 }
 
-function copyText(){
+function newWeek() {
+  if (days.length > 0) {
+    if (!confirm('새 주차를 시작할까요?\n현재 내용은 저장 후 기록탭에서 불러올 수 있어요.')) return;
+  }
+  currentWeekId = null;
+  days = [];
+  localStorage.removeItem('current_week');
+  document.getElementById('save-status').style.display = 'none';
+  renderAllDays();
+  toast('새 주차 시작! 날짜를 추가해주세요 😊');
+}
   navigator.clipboard.writeText(document.getElementById('preview-box').value).then(()=>toast('복사됐어요! 📋'));
 }
 function resetOutput(){

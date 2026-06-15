@@ -634,6 +634,7 @@ function newWeek() {
   renderAllDays();
   toast('새 주차 시작! 날짜를 추가해주세요 😊');
 }
+function copyText(){
   navigator.clipboard.writeText(document.getElementById('preview-box').value).then(()=>toast('복사됐어요! 📋'));
 }
 function resetOutput(){

@@ -605,7 +605,7 @@ function renderAllDays() {
 }
 
 function renderOutput() {
-  let lines=['-금요일 결산-'];
+  let lines=['-금요일 결산-','','',''];
   days.forEach((day,di)=>{
     if(di>0) lines.push('');
     lines.push(formatDate(day.date));

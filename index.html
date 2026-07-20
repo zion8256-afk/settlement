@@ -607,7 +607,7 @@ function renderAllDays() {
 function renderOutput() {
   let lines=['-금요일 결산-','','',''];
   days.forEach((day,di)=>{
-    if(di>0) lines.push('');
+    if(di>0) lines.push('','','');
     lines.push(formatDate(day.date));
     if(day.holiday){
       lines.push('-공휴일');

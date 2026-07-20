@@ -501,7 +501,7 @@ function toggleDirectWork(di,si,item){
 function setDirectExtraWork(di,si,v){days[di].sites[si].directExtraWork=v;}
 function addPartnerEntry(di,si){
   if(!days[di].sites[si].partnerEntries) days[di].sites[si].partnerEntries=[];
-  days[di].sites[si].partnerEntries.push({name:'',count:0,works:[],extraWork:''});
+  days[di].sites[si].partnerEntries.push({name:'',count:0,works:[],extraWork:'',safety:[]});
   renderAllDays();
 }
 function removePartnerEntry(di,si,pi){
@@ -517,6 +517,13 @@ function togglePartnerWork(di,si,pi,item){
   renderAllDays();
 }
 function setExtraWork(di,si,pi,v){days[di].sites[si].partnerEntries[pi].extraWork=v;}
+function togglePartnerSafety(di,si,pi,item){
+  if(!days[di].sites[si].partnerEntries[pi].safety)days[di].sites[si].partnerEntries[pi].safety=[];
+  const arr=days[di].sites[si].partnerEntries[pi].safety;
+  const idx=arr.indexOf(item);
+  if(idx>=0)arr.splice(idx,1);else arr.push(item);
+  renderAllDays();
+}
 
 function formatDate(dateStr) {
   if(!dateStr)return '날짜 미입력';
@@ -546,6 +553,7 @@ function renderAllDays() {
         (site.partnerEntries||[]).forEach((pe,pi)=>{
           const pOpts=partners.map(p=>`<option value="${p}" ${pe.name===p?'selected':''}>${p}</option>`).join('');
           const wChips=workTypes.map(w=>`<button class="chip${(pe.works||[]).includes(w)?' on':''}" onclick="togglePartnerWork(${di},${si},${pi},'${w}')">${w}</button>`).join('');
+          const peSafetyChips=safetyItems.map(s=>`<button class="chip${(pe.safety||[]).includes(s)?' on':''}" onclick="togglePartnerSafety(${di},${si},${pi},'${s}')">${s}</button>`).join('');
           partnerHtml+=`<div class="partner-entry">
             <div class="site-header">
               <select style="flex:1" onchange="setPartnerName(${di},${si},${pi},this.value)">
@@ -558,6 +566,8 @@ function renderAllDays() {
             <div class="row" style="margin-top:8px">
               <input placeholder="추가 공종 직접입력" style="flex:1;font-size:12px" value="${pe.extraWork||''}" oninput="setExtraWork(${di},${si},${pi},this.value)" />
             </div>
+            <div class="field-label">안전 서류</div>
+            <div class="chips-wrap">${peSafetyChips}</div>
             <div class="count-row">
               <label>인원 수</label>
               <input type="number" min="0" max="99" value="${pe.count||0}" onchange="setPartnerCount(${di},${si},${pi},this.value)" />
@@ -628,13 +638,15 @@ function renderOutput() {
         lines.push(dLine);
         // 협력업체
         (site.partnerEntries||[]).forEach(pe=>{
-          if(!pe.name&&!pe.works?.length&&!pe.extraWork)return;
+          if(!pe.name&&!pe.works?.length&&!pe.extraWork&&!pe.safety?.length)return;
           let works=[...(pe.works||[])];
           if(pe.extraWork) works.push(pe.extraWork);
           const wStr=works.join(', ');
+          const peSafetyStr=(pe.safety||[]).join(', ');
+          const workSafety=[wStr,peSafetyStr].filter(Boolean).join(' ');
           let pLine=`협력: ${pe.name||'(업체미입력)'}`;
           if(pe.count) pLine+=` ${pe.count}명`;
-          if(wStr) pLine+=` / 공종: ${wStr}`;
+          if(workSafety) pLine+=` / 공종: ${workSafety}`;
           lines.push(pLine);
         });
       });

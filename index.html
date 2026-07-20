@@ -473,7 +473,7 @@ function removeDay(di){days.splice(di,1);renderAllDays();}
 function setHoliday(di,v){days[di].holiday=v;if(v)days[di].sites=[];renderAllDays();}
 function setDayDate(di,v){days[di].date=v;renderAllDays();}
 function addSiteToDay(di){
-  days[di].sites.push({name:'',directMembers:[],directCount:0,partnerEntries:[],safety:[]});
+  days[di].sites.push({name:'',directMembers:[],directCount:0,directWorks:[],directExtraWork:'',partnerEntries:[],safety:[]});
   renderAllDays();
 }
 function removeSiteFromDay(di,si){days[di].sites.splice(si,1);renderAllDays();}
@@ -491,6 +491,14 @@ function toggleSafety(di,si,item){
   if(idx>=0)arr.splice(idx,1);else arr.push(item);
   renderAllDays();
 }
+function toggleDirectWork(di,si,item){
+  if(!days[di].sites[si].directWorks)days[di].sites[si].directWorks=[];
+  const arr=days[di].sites[si].directWorks;
+  const idx=arr.indexOf(item);
+  if(idx>=0)arr.splice(idx,1);else arr.push(item);
+  renderAllDays();
+}
+function setDirectExtraWork(di,si,v){days[di].sites[si].directExtraWork=v;}
 function addPartnerEntry(di,si){
   if(!days[di].sites[si].partnerEntries) days[di].sites[si].partnerEntries=[];
   days[di].sites[si].partnerEntries.push({name:'',count:0,works:[],extraWork:''});
@@ -531,6 +539,7 @@ function renderAllDays() {
         const opts=sites.map(s=>`<option value="${s}" ${site.name===s?'selected':''}>${s}</option>`).join('');
         const mChips=members.map(m=>`<button class="chip${(site.directMembers||[]).includes(m.initial)?' on':''}" onclick="toggleMember(${di},${si},'${m.initial}')">${m.name}(${m.initial})</button>`).join('');
         const sChips=safetyItems.map(s=>`<button class="chip${(site.safety||[]).includes(s)?' on':''}" onclick="toggleSafety(${di},${si},'${s}')">${s}</button>`).join('');
+        const dwChips=workTypes.map(w=>`<button class="chip${(site.directWorks||[]).includes(w)?' on':''}" onclick="toggleDirectWork(${di},${si},'${w}')">${w}</button>`).join('');
 
         // 협력업체 항목들
         let partnerHtml='';
@@ -567,6 +576,11 @@ function renderAllDays() {
           <div class="section-divider direct"><span>직영</span><hr /></div>
           <div class="field-label" style="margin-top:0">인원</div>
           <div class="chips-wrap">${mChips}</div>
+          <div class="field-label">공종</div>
+          <div class="chips-wrap">${dwChips}</div>
+          <div class="row" style="margin-top:8px">
+            <input placeholder="추가 공종 직접입력" style="flex:1;font-size:12px" value="${site.directExtraWork||''}" oninput="setDirectExtraWork(${di},${si},this.value)" />
+          </div>
           <div class="field-label">안전 서류</div>
           <div class="chips-wrap">${sChips}</div>
           <div class="section-divider partner" style="margin-top:12px"><span>협력업체</span><hr /></div>
@@ -603,7 +617,11 @@ function renderOutput() {
         // 직영
         const mStr=(site.directMembers||[]).map(m=>m+')').join(', ');
         const sStr=(site.safety||[]).join(', ');
+        let dWorks=[...(site.directWorks||[])];
+        if(site.directExtraWork) dWorks.push(site.directExtraWork);
+        const dwStr=dWorks.join(', ');
         let dLine='직영: '+(mStr||'(미입력)');
+        if(dwStr) dLine+=' / 공종: '+dwStr;
         if(sStr) dLine+=' / '+sStr;
         lines.push(dLine);
         // 협력업체

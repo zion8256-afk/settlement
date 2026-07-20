@@ -643,7 +643,7 @@ function renderOutput() {
           if(pe.extraWork) works.push(pe.extraWork);
           const wStr=works.join(', ');
           const peSafetyStr=(pe.safety||[]).join(', ');
-          const workSafety=[wStr,peSafetyStr].filter(Boolean).join(' ');
+          const workSafety=[wStr,peSafetyStr].filter(Boolean).join(' / ');
           let pLine=`협력: ${pe.name||'(업체미입력)'}`;
           if(pe.count) pLine+=` ${pe.count}명`;
           if(workSafety) pLine+=` / 공종: ${workSafety}`;

@@ -606,13 +606,15 @@ function renderAllDays() {
 
 function renderOutput() {
   let lines=['-금요일 결산-'];
-  days.forEach(day=>{
+  days.forEach((day,di)=>{
+    if(di>0) lines.push('');
     lines.push(formatDate(day.date));
     if(day.holiday){
       lines.push('-공휴일');
     } else {
-      day.sites.forEach(site=>{
+      day.sites.forEach((site,si)=>{
         if(!site.name)return;
+        if(si>0) lines.push('');
         lines.push(`-${site.name}`);
         // 직영
         const mStr=(site.directMembers||[]).map(m=>m+')').join(', ');

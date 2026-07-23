@@ -721,16 +721,22 @@ try {
 renderSettings();
 renderAllDays();
 if(scriptUrl){
-  api({action:'getSettings'}).then(res=>{
-    if(res){
-      members=res.members||members;
-      partners=res.partners||partners;
-      sites=res.sites||sites;
-      workTypes=res.workTypes||workTypes;
-      safetyItems=res.safetyItems||safetyItems;
+  Promise.all([api({action:'getSettings'}), api({action:'getWeeks'})]).then(([settingsRes, weeksRes])=>{
+    if(settingsRes){
+      members=settingsRes.members||members;
+      partners=settingsRes.partners||partners;
+      sites=settingsRes.sites||sites;
+      workTypes=settingsRes.workTypes||workTypes;
+      safetyItems=settingsRes.safetyItems||safetyItems;
       updateSyncStatus(true);
-      renderSettings();renderAllDays();
     }
+    if(weeksRes && weeksRes.weeks && weeksRes.weeks.length){
+      const latest = weeksRes.weeks.sort((a,b)=>b.createdAt-a.createdAt)[0];
+      days = latest.days;
+      currentWeekId = latest.id;
+      localStorage.setItem('current_week', JSON.stringify(latest));
+    }
+    renderSettings();renderAllDays();
   });
 }
 </script>

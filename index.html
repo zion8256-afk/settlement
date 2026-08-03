@@ -633,7 +633,7 @@ function renderOutput() {
         if(site.directExtraWork) dWorks.push(site.directExtraWork);
         const dwStr=dWorks.join(', ');
         let dLine='직영: '+(mStr||'(미입력)');
-        if(dwStr) dLine+=' / 공종: '+dwStr;
+        if(dwStr) dLine+=' / '+dwStr;
         if(sStr) dLine+=' / '+sStr;
         lines.push(dLine);
         // 협력업체
@@ -646,7 +646,7 @@ function renderOutput() {
           const workSafety=[wStr,peSafetyStr].filter(Boolean).join(' / ');
           let pLine=`협력: ${pe.name||'(업체미입력)'}`;
           if(pe.count) pLine+=` ${pe.count}명`;
-          if(workSafety) pLine+=` / 공종: ${workSafety}`;
+          if(workSafety) pLine+=` / ${workSafety}`;
           lines.push(pLine);
         });
       });

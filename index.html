@@ -331,6 +331,21 @@ async function saveSettings() {
   if (scriptUrl) await api({action:'saveSettings', settings:{members,partners,sites,workTypes,safetyItems}});
 }
 
+function monthDay(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// 주차 라벨은 저장 시각이 아니라 실제 기록된 날짜(가장 빠른 날짜) 기준 "N월 N주"로 계산한다.
+// 예전에 저장된 기록도 days의 날짜만 있으면 동일하게 표시되도록, label을 새로 저장하지 않고 화면에 표시할 때마다 계산한다.
+function weekDisplayLabel(w) {
+  const validDates = (w.days||[]).map(d => d.date).filter(Boolean).sort();
+  if (!validDates.length) return w.label || '(제목 없음)';
+  const d = new Date(validDates[0]);
+  const weekOfMonth = Math.ceil(d.getDate()/7);
+  return `${d.getMonth()+1}월 ${weekOfMonth}주`;
+}
+
 async function loadHistory() {
   const list = document.getElementById('history-list');
   if (!scriptUrl) {
@@ -347,13 +362,14 @@ async function loadHistory() {
     const item = document.createElement('div');
     item.className = 'week-history-item';
     const wId = w.id;
-    const wLabel = w.label || '(제목 없음)';
-    const wDate = w.createdAt ? new Date(w.createdAt).toLocaleDateString('ko-KR') : '';
+    const wLabel = weekDisplayLabel(w);
+    const validDates = (w.days||[]).map(d => d.date).filter(Boolean).sort();
+    const wRange = validDates.length ? (validDates.length>1 ? `${monthDay(validDates[0])}~${monthDay(validDates[validDates.length-1])}` : monthDay(validDates[0])) : (w.createdAt ? new Date(w.createdAt).toLocaleDateString('ko-KR') : '');
     const wDays = w.days?.length || 0;
     item.innerHTML = `
       <div>
         <div class="week-label-text">📅 ${wLabel}</div>
-        <div class="week-label-sub">${wDate} · ${wDays}일 기록</div>
+        <div class="week-label-sub">${wRange} · ${wDays}일 기록</div>
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-sm load-btn">불러오기</button>

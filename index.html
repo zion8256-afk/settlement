@@ -410,8 +410,12 @@ function weekLabel(days){
   const valid = (days||[]).map(d=>d.date).filter(Boolean).sort();
   if(!valid.length) return new Date().toLocaleDateString('ko-KR');
   const first = new Date(valid[0]+'T00:00:00');
-  const month = first.getMonth()+1;
-  const weekOfMonth = Math.ceil(first.getDate()/7);
+  let month = first.getMonth()+1;
+  let weekOfMonth = Math.ceil(first.getDate()/7);
+  if(weekOfMonth > 4){
+    weekOfMonth = 1;
+    month = month === 12 ? 1 : month + 1;
+  }
   return `${month}월 ${weekOfMonth}주`;
 }
 async function saveWeek() {
